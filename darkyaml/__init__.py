@@ -1,40 +1,61 @@
 import ruamel.yaml, json
-# from self.yaml.loader import FullLoader
-# from self.yaml.loader import SafeLoader
-# from self.yaml.loader import BaseLoader
-# from self.yaml.loader import UnsafeLoader
 
-
-class DarkYaml:
+class DarkYaml(dict):
     def __init__(self, filepth, typ='rt'):
+        super().__init__()
+        
         self.filepth = filepth
         self.yaml = ruamel.yaml.YAML(typ=typ)
         self.yaml.indent(sequence=4, offset=2)
         
-        self.get = self.__getitem__
-        self.set = self.__setitem__
+        self.update(self._load())
     
-        
-    def __getitem__(self, item):
-        return self._load()[item]
-    
-    def __setitem__(self, key, item):
-        data = self._load()
-        data[key] = item
-        
-        self._dump(data)
-        
     def _dump(self, data):
+        
+        
         with open(self.filepth, 'w') as file:
-            self.yaml.dump(data, file)
+            self.yaml.dump(dict(data), file)
     
     def _load(self):
         with open(self.filepth, 'r') as file:
             return self.yaml.load(file)
+            
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self._dump(self)
+        
+    def __delitem__(self, key):
+        super().__delitem__(key)
+        self._dump(self)
         
     
-    def __str__(self):
-        return json.dumps(self._load(), indent=8)
-   
-    def __repr__(self):
-        return json.dumps(self._load(), indent=8)
+    def pop(self, key):
+        super().pop(key)
+        self._dump(self)
+        
+    def popitem(self):
+        super().popitem()
+        self._dump(self)
+        
+    def update(self, dc):
+        super().update(dc)
+        self._dump(self)
+        
+    def clear(self):
+        super().clear()
+        self._dump(self)
+        
+    
+db = DarkYaml('r.yml')
+db.update(dict(a=1,r=2,g=3))
+print(db)
+db['s']=8
+print(db)
+del db['a']
+print(db)
+db.pop('r')
+print(db)
+db.popitem()
+print(db)
+db.clear()
+db['f']=10
