@@ -45,17 +45,4 @@ class DarkYaml(dict):
         super().clear()
         self._dump(self)
         
-    
-db = DarkYaml('r.yml')
-db.update(dict(a=1,r=2,g=3))
-print(db)
-db['s']=8
-print(db)
-del db['a']
-print(db)
-db.pop('r')
-print(db)
-db.popitem()
-print(db)
-db.clear()
-db['f']=10
+ 
